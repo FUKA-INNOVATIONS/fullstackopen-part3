@@ -4,7 +4,7 @@ const cors = require('cors')
 const app = express();
 app.use( express.json() );
 app.use(cors())
-
+app.use(express.static('./puhelinluettelo/build'))
 app.use( morgan( ( tokens, req, res ) => {
   return [
     tokens.method( req, res ),
@@ -65,10 +65,10 @@ app.delete( '/api/persons/:id', ( req, res ) => {
       ? personFound = persons.find( person => person.id === personId )
       : res.status( 400 ).json( { message: 'Id should be intiger' } );
   if ( personFound ) {
-    persons.filter( person => person.id !== personId );
+    persons = persons.filter( person => person.id !== personId );
     res.status( 204 ).end();
   } else {
-    res.status( 400 ).
+    res.status( 404 ).
         json( { message: `Person with id ${ personId } not found` } );
   }
 } );
