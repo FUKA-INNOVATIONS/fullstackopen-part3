@@ -14,6 +14,25 @@ app.get( '/api/persons/:id', ( req, res ) => {
   personFound ? res.json(personFound) : res.status(400).end()
 } );
 
+// Create new person
+app.post('/api/persons', (req, res) => {
+  // Todo: Check for duplicated ids before saving
+  const generateNewId = Math.floor(Math.random() * 900000000000) +1
+  const body = req.body
+
+  if (!body || !body.name || !body.number) return res.status(400).json({message: 'Content is missing.'}).end()
+
+  const newPerson = {
+    id: generateNewId,
+    name: body.name,
+    number: body.number
+  }
+
+  persons = persons.concat(newPerson)
+  res.json(persons)
+
+})
+
 // Delete person by id
 app.delete( '/api/persons/:id', ( req, res ) => {
   const personId = Number(Math.trunc(req.params.id))
