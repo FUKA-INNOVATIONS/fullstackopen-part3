@@ -2,20 +2,25 @@ const express = require( 'express' );
 const app = express();
 app.use( express.json() );
 
+// Get all persons
 app.get( '/api/persons', ( req, res ) => {
   res.json( notes );
 } );
 
+// Get person by id
 app.get( '/api/persons/:id', ( req, res ) => {
-  let person;
-  res.json( notes );
+  const personId = Number(req.params.id)
+  const personFound = notes.find(person => person.id === personId );
+  personFound ? res.json(personFound) : res.status(400).end()
 } );
 
+// Get total amount of phone book entries
 app.get( '/info', ( req, res ) => {
   const timeStamp = Date();
   const personsCount = notes.length;
   res.send(`<p>Phone book has info of ${personsCount} people</p><p>${timeStamp}</p>`)
 } );
+
 
 const PORT = 3001;
 app.listen( PORT, () => {
