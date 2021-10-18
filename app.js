@@ -11,16 +11,20 @@ app.get( '/api/persons', ( req, res ) => {
 app.get( '/api/persons/:id', ( req, res ) => {
   const personId = Number(req.params.id)
   const personFound = persons.find(person => person.id === personId );
-  personFound ? res.json(personFound) : res.status(400).end()
+  personFound ? res.json(personFound) : res.status(404).json({message: 'Person not found'}).end()
 } );
 
 // Create new person
 app.post('/api/persons', (req, res) => {
-  // Todo: Check for duplicated ids before saving
+  // Todo: Pervent duplicated ids
   const generateNewId = Math.floor(Math.random() * 900000000000) +1
   const body = req.body
 
-  if (!body || !body.name || !body.number) return res.status(400).json({message: 'Content is missing.'}).end()
+  if (!body.name || !body.number) return res.status(400).json({message: 'Content is missing.'}).end()
+
+  // Check for existing number
+  const nameExists = persons.filter(person => person.name.toLowerCase() === body.name.toLowerCase())
+  if (nameExists.length > 0) return res.status(403).json({message: 'name must be unique'})
 
   const newPerson = {
     id: generateNewId,
