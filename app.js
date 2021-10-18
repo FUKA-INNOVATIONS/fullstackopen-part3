@@ -1,8 +1,19 @@
 const express = require( 'express' );
-const morgan = require('morgan')
+const morgan = require( 'morgan' );
 const app = express();
-app.use(morgan('tiny'))
 app.use( express.json() );
+
+app.use( morgan( ( tokens, req, res ) => {
+  return [
+    tokens.method( req, res ),
+    tokens.url( req, res ),
+    tokens.status( req, res ),
+    tokens.res( req, res, 'content-length' ), '-',
+    tokens[ 'response-time' ]( req, res ), 'ms',
+    JSON.stringify(req.body),
+  ].join( ' ' );
+} ) );
+
 
 // Get all persons
 app.get( '/api/persons', ( req, res ) => {
@@ -11,43 +22,52 @@ app.get( '/api/persons', ( req, res ) => {
 
 // Get person by id
 app.get( '/api/persons/:id', ( req, res ) => {
-  const personId = Number(req.params.id)
-  const personFound = persons.find(person => person.id === personId );
-  personFound ? res.json(personFound) : res.status(404).json({message: 'Person not found'}).end()
+  const personId = Number( req.params.id );
+  const personFound = persons.find( person => person.id === personId );
+  personFound ? res.json( personFound ) : res.status( 404 ).
+      json( { message: 'Person not found' } ).
+      end();
 } );
 
 // Create new person
-app.post('/api/persons', (req, res) => {
+app.post( '/api/persons', ( req, res ) => {
   // Todo: Pervent duplicated ids
-  const generateNewId = Math.floor(Math.random() * 900000000000) +1
-  const body = req.body
+  const generateNewId = Math.floor( Math.random() * 900000000000 ) + 1;
+  const body = req.body;
 
-  if (!body.name || !body.number) return res.status(400).json({message: 'Content is missing.'}).end()
+  if ( !body.name || !body.number ) return res.status( 400 ).
+      json( { message: 'Content is missing.' } ).
+      end();
 
   // Check for existing number
-  const nameExists = persons.filter(person => person.name.toLowerCase() === body.name.toLowerCase())
-  if (nameExists.length > 0) return res.status(403).json({message: 'name must be unique'})
+  const nameExists = persons.filter(
+      person => person.name.toLowerCase() === body.name.toLowerCase() );
+  if ( nameExists.length > 0 ) return res.status( 403 ).
+      json( { message: 'name must be unique' } );
 
   const newPerson = {
     id: generateNewId,
     name: body.name,
-    number: body.number
-  }
+    number: body.number,
+  };
 
-  persons = persons.concat(newPerson)
-  res.json(persons)
+  persons = persons.concat( newPerson );
+  res.json( persons );
 
-})
+} );
 
 // Delete person by id
 app.delete( '/api/persons/:id', ( req, res ) => {
-  const personId = Number(Math.trunc(req.params.id))
-  personId ?  personFound = persons.find(person => person.id === personId ) : res.status(400).json({message: 'Id should be intiger'})
-  if (personFound) {
-    persons.filter(person => person.id !== personId)
-    res.status(204).end()
+  const personId = Number( Math.trunc( req.params.id ) );
+  personId
+      ? personFound = persons.find( person => person.id === personId )
+      : res.status( 400 ).json( { message: 'Id should be intiger' } );
+  if ( personFound ) {
+    persons.filter( person => person.id !== personId );
+    res.status( 204 ).end();
   } else {
-    res.status(400).json({message: `Person with id ${personId} not found`})
+    res.status( 400 ).
+        json( { message: `Person with id ${ personId } not found` } );
   }
 } );
 
@@ -55,9 +75,9 @@ app.delete( '/api/persons/:id', ( req, res ) => {
 app.get( '/info', ( req, res ) => {
   const timeStamp = Date();
   const personsCount = persons.length;
-  res.send(`<p>Phone book has info of ${personsCount} people</p><p>${timeStamp}</p>`)
+  res.send(
+      `<p>Phone book has info of ${ personsCount } people</p><p>${ timeStamp }</p>` );
 } );
-
 
 const PORT = 3001;
 app.listen( PORT, () => {
@@ -68,21 +88,21 @@ let persons = [
   {
     id: 1,
     name: 'Arto Hellas',
-    number: '040-123456'
+    number: '040-123456',
   },
   {
     id: 2,
     name: 'Ada Lovelace',
-    number: '39-324234324'
+    number: '39-324234324',
   },
   {
     id: 3,
     name: 'Dan Sukunimi',
-    number: '045-3424324'
+    number: '045-3424324',
   },
   {
     id: 4,
     name: 'Aary Monroes',
-    number: '044-23423423'
-  }
+    number: '044-23423423',
+  },
 ];
