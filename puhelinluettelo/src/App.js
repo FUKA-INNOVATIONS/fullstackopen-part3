@@ -47,7 +47,6 @@ const App = () => {
     } else {
       setShowAll( true );
     }
-
     setNameFilter( filterTerm );
   };
 
@@ -60,7 +59,6 @@ const App = () => {
   // Add new person to the list
   const handleAddPerson = ( e ) => {
     e.preventDefault();
-
     let personExists = false;
 
     // Check and alert incase name already exists
@@ -70,7 +68,7 @@ const App = () => {
 
         // Update number if user entered new number
         if ( newPhone.length !== 0 ) {
-          const updatedPerson = {
+          const editedPerson = {
             name: person.name,
             number: newPhone,
           };
@@ -78,9 +76,9 @@ const App = () => {
           let updateConfirmed = window.confirm(
               `${ person.name } is already added to phonebook, replace the old number with a new one?` );
           if ( updateConfirmed ) {
-            peopleService.upadateNumber( person.id, updatedPerson );
+            peopleService.upadateNumber( person.id, editedPerson );
             setPersons( persons.filter( p => p.id !== person.id ).
-                concat( updatedPerson ) );
+                concat( editedPerson ) );
 
             showMessage( `${ newName }'s phone number is updated!`, 'success' );
           }
@@ -118,6 +116,11 @@ const App = () => {
     if ( deleteConfirmed ) {
       peopleService.deletePerson( personId )
       .then(response => {
+        //console.log('deletePerson response in App.js: ', response);
+        //console.log('response status in App.js delete: ', response.status)
+
+        //if(response.status === 404) showMessage( `Information of ${ personName } has already been removed.`, 'error')
+
         peopleService.getAll().then( response => {
           setPersons( response );
         } );

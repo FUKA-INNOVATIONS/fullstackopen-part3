@@ -7,22 +7,19 @@ const getAll = () => {
 };
 
 const create = newPerson => {
-  console.log('create from react persons 1');
   const request = axios.post( baseUrl, newPerson );
-  //console.log(request.then(request.data))
-  console.log('create from react persons 2');
   return request.then( response => response.data );
 };
 
 const deletePerson = personId => {
   const request = axios.delete(`${baseUrl}/${personId}`)
-  console.log('deleteReq: ', request);
+  console.log('return req in App>persons.js: ', request);
   return request
 }
 
-const upadateNumber = (id, updatedPerson) => {
+const upadateNumber = (id, editedPerson) => {
   const request = axios
-      .put(`${baseUrl}/${id}`, updatedPerson)
+      .put(`${baseUrl}/${id}`, editedPerson)
       .then(response => response.data)
       .catch(err => err)
 }
