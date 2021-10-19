@@ -19,8 +19,6 @@ app.use( morgan( ( tokens, req, res ) => {
 } ) );
 
 
-
-
 // Get all persons
 app.get( '/api/persons', ( req, res, next ) => {
   Person.find( {} ).then( result => {
@@ -49,55 +47,21 @@ app.get( '/api/persons/:id', ( req, res, next ) => {
 
 // Create new person
 app.post( '/api/persons', ( req, res, next ) => {
-
   const body = req.body;
-
-  if ( !body.name || !body.number ) return res.status( 400 ).
-      json( { message: 'Content is missing.' } ).
-      end();
 
   const newPerson = new Person( {
     name: body.name,
     number: body.number,
   } );
 
-  newPerson.save().then( savedPerson => {
-    console.log( 'newPerson.save called' );
-    res.json( savedPerson );
-    console.log( 'savedPerson returned: ', savedPerson );
-  } ).catch( err => {
-    res.json( {
-      info: 'Saving failed',
-      errorMessage: err.message,
-    } );
-    return next(err)
-  } );
-
-  /*// Todo: Pervent duplicated ids
-   const generateNewId = Math.floor( Math.random() * 900000000000 ) + 1;
-   const body = req.body;
-
-   if ( !body.name || !body.number ) return res.status( 400 ).
-   json( { message: 'Content is missing.' } ).
-   end();
-
-   // Check for existing number
-   const nameExists = persons.filter(
-   person => person.name.toLowerCase() === body.name.toLowerCase() );
-   if ( nameExists.length > 0 ) return res.status( 403 ).
-   json( { message: 'name must be unique' } );
-
-   const newPerson = {
-   id: generateNewId,
-   name: body.name,
-   number: body.number,
-   };
-
-   persons = persons.concat( newPerson );
-   res.json( persons ); */
-
+  newPerson
+  .save()
+  .then( savedPerson => res.json( savedPerson ))
+  .then(savedAndFormattedPerson => res.json(savedAndFormattedPerson))
+  .catch(err => next(err) );
 } );
 
+// Update person
 app.put('/api/persons/:id', (req, res, next) => {
   const personId = req.params.id
   const body = req.body
@@ -111,7 +75,10 @@ app.put('/api/persons/:id', (req, res, next) => {
   .then(updatedPerson => {
     res.json(updatedPerson)
   })
-  .catch(error => next(error))
+  .catch(err => {
+    next(err)
+    console.log('error in createPErson route: ', err);
+  })
 })
 
 // Delete person by id
@@ -140,7 +107,14 @@ app.use(unknownEndpoint)
 
 const errorHandler = (error, request, response, next) => {
   console.error('error handler', error.message)
-  if (error.name === 'CastError') {return response.status(400).send({ error: 'malformatted id' })}
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } else if (error.name === 'ValidationError') {
+    console.log('err.msg in errHandler/ValErr: ', error.message);
+    return response.status(400).json({ error: error.message })
+  }
+
   next(error)
 }
 app.use(errorHandler)

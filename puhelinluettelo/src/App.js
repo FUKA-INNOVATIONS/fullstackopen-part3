@@ -59,6 +59,7 @@ const App = () => {
   // Add new person to the list
   const handleAddPerson = ( e ) => {
     e.preventDefault();
+
     let personExists = false;
 
     // Check and alert incase name already exists
@@ -91,20 +92,25 @@ const App = () => {
 
     // Add new person to phonebook
     if ( !personExists ) {
+
       const newPerson = {
         name: newName,
         number: newPhone,
-      };
-      peopleService.create( newPerson ).
-          then( returnedPerson => {
-            //console.log('before setPersons in App.js createNew');
-            setPersons( persons.concat(returnedPerson) );
-            //console.log('before setPersons in App.js createNew');
-            setNewName( '' );
-            setNewPhone( '' );
-          } );
+      }
 
-      showMessage( `${ newName }'s phone number is added!`, 'success' );
+      peopleService.create( newPerson ).
+          then( response => {
+            //console.log(response);
+            setPersons( persons.concat(response.data) );
+            showMessage( `${ newName }'s phone number is added!`, 'success' );
+            //console.log(response);
+            setNewName( '' ); setNewPhone( '' );
+          }).catch(err => {
+        console.log('ERROR message::', err.response.data.error);
+        showMessage(`${err.response.data.error}`, 'error')
+      })
+
+
     }
   };
 
@@ -119,7 +125,6 @@ const App = () => {
         //console.log('deletePerson response in App.js: ', response);
         //console.log('response status in App.js delete: ', response.status)
 
-        //if(response.status === 404) showMessage( `Information of ${ personName } has already been removed.`, 'error')
 
         peopleService.getAll().then( response => {
           setPersons( response );
