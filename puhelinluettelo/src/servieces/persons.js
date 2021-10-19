@@ -7,8 +7,10 @@ const getAll = () => {
 };
 
 const create = newPerson => {
+  console.log('create from react persons 1');
   const request = axios.post( baseUrl, newPerson );
-  console.log(request.then(request.data))
+  //console.log(request.then(request.data))
+  console.log('create from react persons 2');
   return request.then( response => response.data );
 };
 

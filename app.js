@@ -1,8 +1,10 @@
+require('dotenv').config()
 const express = require( 'express' );
 const morgan = require( 'morgan' );
 const cors = require('cors')
 const app = express();
 app.use( express.json() );
+const Person = require('./models/person')
 app.use(cors())
 app.use(express.static('build'))
 app.use( morgan( ( tokens, req, res ) => {
@@ -19,21 +21,60 @@ app.use( morgan( ( tokens, req, res ) => {
 
 // Get all persons
 app.get( '/api/persons', ( req, res ) => {
-  res.json( persons );
+  Person.find({}).then(result => {
+    res.json(result)
+  }).catch(err => {
+    res.json({
+      info: 'Fetching Persons failed',
+      errorMessage: err.message
+    })
+  })
+
+  /*res.json( persons );*/
 } );
 
 // Get person by id
 app.get( '/api/persons/:id', ( req, res ) => {
-  const personId = Number( req.params.id );
-  const personFound = persons.find( person => person.id === personId );
-  personFound ? res.json( personFound ) : res.status( 404 ).
-      json( { message: 'Person not found' } ).
-      end();
+
+  const personId = req.params.id;
+  const findPerson = Person.findById(personId).then(person => {
+    res.json(person)
+  }).catch(e => {
+    res.json({
+      info: `Person with ${personId} not found`,
+      errosMessage: e.message
+    })
+  })
+
+
 } );
 
 // Create new person
 app.post( '/api/persons', ( req, res ) => {
-  // Todo: Pervent duplicated ids
+
+  const body = req.body
+
+  if ( !body.name || !body.number ) return res.status( 400 ).
+      json( { message: 'Content is missing.' } ).
+      end();
+
+  const newPerson = new Person({
+    name: body.name,
+    number: body.number
+  })
+
+  newPerson.save().then(savedPerson => {
+    console.log('newPerson.save called');
+    res.json(savedPerson)
+    console.log('savedPerson returned: ', savedPerson);
+  }).catch(err => {
+    res.json({
+      info: 'Saving failed',
+      errorMessage: err.message
+    })
+  })
+
+  /*// Todo: Pervent duplicated ids
   const generateNewId = Math.floor( Math.random() * 900000000000 ) + 1;
   const body = req.body;
 
@@ -54,7 +95,7 @@ app.post( '/api/persons', ( req, res ) => {
   };
 
   persons = persons.concat( newPerson );
-  res.json( persons );
+  res.json( persons ); */
 
 } );
 

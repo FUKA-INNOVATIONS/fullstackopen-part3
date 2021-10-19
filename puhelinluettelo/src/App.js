@@ -7,7 +7,7 @@ import {
   SuccessNotification,
   ErrorNotification,
 } from './components/Notification';
-//
+
 const App = () => {
 
   const [ persons, setPersons ] = useState( [] );
@@ -98,8 +98,10 @@ const App = () => {
         number: newPhone,
       };
       peopleService.create( newPerson ).
-          then( returnedPersons => {
-            setPersons( returnedPersons );
+          then( returnedPerson => {
+            //console.log('before setPersons in App.js createNew');
+            setPersons( persons.concat(returnedPerson) );
+            //console.log('before setPersons in App.js createNew');
             setNewName( '' );
             setNewPhone( '' );
           } );
@@ -138,7 +140,7 @@ const App = () => {
       : <ErrorNotification message={errorMessage} />
 
   return (
-      <div className={ 'main' }>
+      <div style={{margin: 20}} className={ 'main' }>
         { notificationContent }
         <h2>Phonebook</h2>
         <Filter nameFilter={ nameFilter }
