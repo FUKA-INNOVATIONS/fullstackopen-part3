@@ -26,8 +26,7 @@ jobs:
       - name: lint
         run: npm run lint
       - name: build
-        uses: actions/setup-node@v1
-        run: npm run build:ui
+        run: npm run build:ui --if-present
       - name: test
         run: npm run test
       - name: Deploy heroku
