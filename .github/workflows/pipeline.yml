@@ -1,0 +1,74 @@
+name: Deployment pipeline
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches: [ master ]
+    types: [ opened, synchronize ]
+
+jobs:
+  simple_deployment_pipeline:
+    runs-on: ubuntu-18.04
+    # 1. if check ensures that the step is executed only
+    # when the code is being merged or pushed to the main branch
+    # When a pull request is merged, the name of the event is somehow paradoxically push.
+    # 2. Skip deployment if commit message contains #skip
+    steps:
+      # The uses keyword tells the workflow to run a specific action
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
+      - name: npm install
+        run: npm install
+      - name: lint
+        run: npm run eslint
+      - name: build
+        run: npm run build:ui
+      - name: test
+        run: npm run test
+      - name: Deploy heroku
+        if: ${{ github.event_name == 'push' && !contains(github.event.head_commit.message, '#skip') }}
+        uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "node-fullstackopen-part3"
+          heroku_email: "fuad.kalhori@gmail.com"
+          healthcheck: "https://node-fullstackopen-part3.herokuapp.com/health"
+          checkstring: "ok"
+          rollbackonhealthcheckfailed: true
+      # Build success/failure notification action, Slack notification
+      - name: Slack error notification
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,took
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+      - name: Slack success notification
+        if: success()
+        uses: 8398a7/action-slack@v3.12.0
+        with:
+          status: custom
+          fields: workflow,job,commit,repo,ref,author,took
+          custom_payload: |
+            {
+              attachments: [{
+                color: '${{ job.status }}' === 'success' ? 'good' : '${{ job.status }}' === 'failure' ? 'danger' : 'warning',
+                text: `A new version deployed to https://node-fullstackopen-part3.herokuapp.com/ (${process.env.AS_COMMIT}) by ${process.env.AS_AUTHOR} ${{ job.status }} build took ${process.env.AS_TOOK}`,
+              }]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+
+      # Increase the version when a pull request is merged into the main branch
+      - uses: actions/checkout@v2
+      - name: Bump version and push tag
+        if: ${{ github.event_name == 'push' && !contains(github.event.head_commit.message, '#skip') }}
+        uses: anothrNick/github-tag-action@1.33.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BUMP: "patch"

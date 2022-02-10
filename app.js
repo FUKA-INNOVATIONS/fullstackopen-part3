@@ -19,6 +19,10 @@ app.use( morgan( ( tokens, req, res ) => {
 } ) )
 
 
+app.get('/health', (req, res) => {
+  res.send('ok')
+})
+
 // Get all persons
 app.get( '/api/persons', ( req, res, next ) => {
   Person.find( {} ).then( result => {
