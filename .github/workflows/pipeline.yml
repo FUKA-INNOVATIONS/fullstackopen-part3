@@ -25,6 +25,8 @@ jobs:
         run: |
           npm install
           npm run build:ui
+        env:
+          CI: true
       - name: lint
         run: npm run lint
       - name: test
