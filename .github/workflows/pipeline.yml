@@ -11,11 +11,6 @@ on:
 jobs:
   simple_deployment_pipeline:
     runs-on: ubuntu-18.04
-
-    strategy:
-      matrix:
-        node-version: [ 14.x ]
-
     # 1. if check ensures that the step is executed only
     # when the code is being merged or pushed to the main branch
     # When a pull request is merged, the name of the event is somehow paradoxically push.
@@ -26,12 +21,12 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '14.x'
-      - name: npm install
-        run: npm install
+      - name: npm install and build ui
+        run: |
+          npm install
+          npm run build:ui
       - name: lint
         run: npm run lint
-      - name: build
-        run: CI="" npm run build:ui
       - name: test
         #run: npm run test
       - name: Deploy heroku
