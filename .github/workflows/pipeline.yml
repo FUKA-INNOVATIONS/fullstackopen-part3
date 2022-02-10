@@ -26,7 +26,7 @@ jobs:
       - name: lint
         run: npm run lint
       - name: build
-        run: npm install
+        uses: actions/setup-node@v1
         run: npm run build:ui
       - name: test
         run: npm run test
