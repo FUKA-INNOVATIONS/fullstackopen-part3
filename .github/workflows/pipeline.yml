@@ -26,7 +26,7 @@ jobs:
       - name: lint
         run: npm run lint
       - name: build
-        uses: actions/checkout@v2
+        run: npm install
         run: npm run build:ui
       - name: test
         run: npm run test
