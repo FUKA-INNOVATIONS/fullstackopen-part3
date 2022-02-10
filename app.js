@@ -6,7 +6,7 @@ app.use( express.static( 'build' ) )
 const morgan = require( 'morgan' )
 const cors = require( 'cors' )
 app.use( cors() )
-const Person = require( './models/person' )
+const Person = require( './models/person' );
 app.use( morgan( ( tokens, req, res ) => {
   return [
     tokens.method( req, res ),
