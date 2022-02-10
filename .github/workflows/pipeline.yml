@@ -22,13 +22,11 @@ jobs:
         with:
           node-version: '14.x'
       - name: npm install
-        run: npm install
+        run: npm ci
       - name: lint
         run: npm run lint
       - name: build
-        run: npm run build:ui --if-present
-        env:
-          CI: false
+        run: npm run build:ui
       - name: test
         run: npm run test
       - name: Deploy heroku
