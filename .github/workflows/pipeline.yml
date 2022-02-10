@@ -21,9 +21,12 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '14.x'
-      - run: npm install
-      - run: npm run lint
-      - run: npm run build:ui
+      - name: npm install
+        run: npm install
+      - name: lint
+        run: npm run lint
+      - name: build
+        run: CI="" npm run build:ui
       - name: test
         run: npm run test
       - name: Deploy heroku
