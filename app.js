@@ -19,6 +19,7 @@ app.use( morgan( ( tokens, req, res ) => {
 } ) )
 
 // testing pull approval
+// test deleted tag to generate new
 
 app.get('/health', (req, res) => {
   res.send('ok')
