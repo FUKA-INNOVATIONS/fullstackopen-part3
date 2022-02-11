@@ -20,7 +20,7 @@ app.use( morgan( ( tokens, req, res ) => {
 
 // testing pull approval
 // test deleted tag to generate new...
-// test pr and tag
+// test pr and tag..
 
 
 app.get('/health', (req, res) => {
