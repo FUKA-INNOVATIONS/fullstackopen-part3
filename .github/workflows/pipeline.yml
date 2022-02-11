@@ -25,6 +25,10 @@ jobs:
         run: npm install
       - name: lint
         run: npm run lint
+      - name: Install puhelinuettelo dependencies
+        run: |
+          cd puhelinluettelo
+          npm install
       - name: build
         run: npm run build:ui
       - name: test
