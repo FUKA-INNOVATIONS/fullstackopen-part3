@@ -16,11 +16,13 @@ const deletePerson = personId => {
   return request
 }
 
+// eslint-disable-next-line
 const upadateNumber = (id, updatedPerson) => {
+  // eslint-disable-next-line
   const request = axios
       .put(`${baseUrl}/${id}`, updatedPerson)
       .then(response => response.data)
       .catch(err => err)
 }
-
+// eslint-disable-next-line
 export default { getAll, create, deletePerson, upadateNumber };

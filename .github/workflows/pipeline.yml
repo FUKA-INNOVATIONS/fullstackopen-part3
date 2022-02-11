@@ -20,13 +20,13 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: '17.x'
+          node-version: '14.x'
       - name: npm install
         run: npm install
       - name: lint
         run: npm run lint
       - name: build
-        run: CI="" npm run build:ui
+        run: npm run build:ui
       - name: test
         run: npm run test
       - name: Deploy heroku

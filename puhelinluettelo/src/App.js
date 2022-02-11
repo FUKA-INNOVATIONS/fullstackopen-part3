@@ -78,8 +78,7 @@ const App = () => {
               `${ person.name } is already added to phonebook, replace the old number with a new one?` );
           if ( updateConfirmed ) {
             peopleService.upadateNumber( person.id, editedPerson );
-            setPersons( persons.filter( p => p.id !== person.id ).
-                concat( editedPerson ) );
+            setPersons( persons.filter( p => p.id !== person.id ).concat( editedPerson ) );
 
             showMessage( `${ newName }'s phone number is updated!`, 'success' );
           }
@@ -98,8 +97,7 @@ const App = () => {
         number: newPhone,
       }
 
-      peopleService.create( newPerson ).
-          then( response => {
+      peopleService.create( newPerson ).then( response => {
             //console.log(response);
             setPersons( persons.concat(response.data) );
             showMessage( `${ newName }'s phone number is added!`, 'success' );
